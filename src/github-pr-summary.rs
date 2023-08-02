@@ -16,8 +16,8 @@ use std::env;
 //   the max token size or word count for GPT4 is 8192
 //   the max token size or word count for GPT35Turbo is 4096
 static CHAR_SOFT_LIMIT : usize = 9000;
-static MODEL : ChatModel = ChatModel::GPT35Turbo;
-// static MODEL : ChatModel = ChatModel::GPT4;
+// static MODEL : ChatModel = ChatModel::GPT35Turbo;
+static MODEL : ChatModel = ChatModel::GPT4;
 
 #[no_mangle]
 #[tokio::main(flavor = "current_thread")]
@@ -118,7 +118,7 @@ async fn handler(
         }
     } else {
         // PR OPEN or Trigger phrase: create a new comment
-        match issues.create_comment(pull_number, "Hello, I am a [code review bot](https://github.com/flows-network/github-pr-summary/) on [flows.network](https://flows.network/).\n\nIt could take a few minutes for me to analyze this PR. Relax, grab a cup of coffee and check back later. Thanks!").await {
+        match issues.create_comment(pull_number, "Hello, I am a [code review bot](https://github.com/flows-network/github-pr-summary/) on [flows.network](https://flows.network/).\n\nIt could take a few minutes for me to analyze this PR. Relax, grab a cup of coffee and check back later. Thanks! よろ〜！").await {
             Ok(comment) => {
                 comment_id = comment.id;
             }
@@ -175,7 +175,7 @@ async fn handler(
             restart: true,
             system_prompt: Some(system),
         };
-        let question = "The following is a GitHub patch. Please summarize the key changes and identify potential problems. Start with the most important findings.\n\n".to_string() + truncate(commit, CHAR_SOFT_LIMIT);
+        let question = "The following is a GitHub patch. Please summarize the key changes and identify potential problems in japanese. Start with the most important findings.\n\n".to_string() + truncate(commit, CHAR_SOFT_LIMIT);
         match openai.chat_completion(&chat_id, &question, &co).await {
             Ok(r) => {
                 if reviews_text.len() < CHAR_SOFT_LIMIT {
@@ -205,7 +205,7 @@ async fn handler(
             restart: true,
             system_prompt: Some(system),
         };
-        let question = "Here is a set of summaries for software source code patches. Each summary starts with a ------ line. Please write an overall summary considering all the individual summary. Please present the potential issues and errors first, following by the most important findings, in your summary.\n\n".to_string() + &reviews_text;
+        let question = "Here is a set of summaries for software source code patches. Each summary starts with a ------ line. Please write an overall summary considering all the individual summary in japanese. Please present the potential issues and errors first, following by the most important findings, in your summary.\n\n".to_string() + &reviews_text;
         match openai.chat_completion(&chat_id, &question, &co).await {
             Ok(r) => {
                 resp.push_str(&r.choice);
